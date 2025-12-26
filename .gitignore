@@ -1,0 +1,41 @@
+# === Data / Large files ===
+# Ignore dataset folders (covers "dataset" and "dataset - Copy")
+dataset/
+dataset - Copy/
+dataset*/
+
+# Common data files (if any)
+*.csv
+*.tsv
+*.pkl
+*.parquet
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+pip-wheel-metadata/
+build/
+dist/
+
+# Virtualenvs / envs
+venv/
+env/
+.venv/
+ENV/
+
+# === Jupyter ===
+.ipynb_checkpoints/
+
+# === IDE / OS ===
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# === Logs / databases / secrets ===
+*.log
+*.sqlite
+*.env
+.env.local
