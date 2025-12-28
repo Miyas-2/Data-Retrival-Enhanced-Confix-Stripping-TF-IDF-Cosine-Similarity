@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Indonesian Document Retrieval System</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1152d4",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-900 dark:text-white">
+    <!-- Top Navigation -->
+    <header class="sticky top-0 z-50 bg-white/90 dark:bg-[#1a202c]/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-6 py-3">
+        <div class="max-w-[1200px] mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="size-8 flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined text-3xl">manage_search</span>
+                </div>
+                <h2 class="text-lg font-bold">IndoRetrieve</h2>
+            </div>
+            <div class="flex items-center gap-8">
+                <div class="hidden md:flex items-center gap-6">
+                    <a class="text-sm font-bold text-primary" href="/">Home</a>
+                    <a class="text-sm font-medium hover:text-primary transition-colors" href="/dashboard">Demo</a>
+                    <a class="text-sm font-medium hover:text-primary transition-colors" href="/preprocessing">Pipeline</a>
+                    <a class="text-sm font-medium hover:text-primary transition-colors" href="/tfidf">TF-IDF</a>
+                </div>
+                <a href="/dashboard" class="flex items-center justify-center rounded-lg h-10 px-6 bg-primary text-white hover:bg-blue-700 transition-colors text-sm font-bold shadow-sm">
+                    Try Demo
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main class="flex-1 flex flex-col items-center px-4 sm:px-6 lg:px-8 py-16">
+        <div class="w-full max-w-[1024px] flex flex-col items-center gap-12">
+            <div class="text-center flex flex-col gap-6 max-w-3xl">
+                <h1 class="text-5xl md:text-6xl font-black leading-tight tracking-[-0.033em]">
+                    Indonesian Document Retrieval System
+                </h1>
+                <p class="text-gray-600 dark:text-gray-400 text-lg md:text-xl leading-relaxed">
+                    Educational platform demonstrating <span class="text-primary font-bold">Enhanced Confix Stripping (ECS)</span> stemming,
+                    <span class="text-primary font-bold">TF-IDF</span> weighting, and <span class="text-primary font-bold">Vector Space Model</span> retrieval
+                    for Indonesian text processing.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center mt-4">
+                    <a href="/dashboard" class="flex items-center justify-center gap-2 rounded-lg h-12 px-8 bg-primary text-white hover:bg-blue-700 transition-colors text-base font-bold shadow-lg">
+                        <span class="material-symbols-outlined">rocket_launch</span>
+                        Launch Demo
+                    </a>
+                    <a href="/preprocessing" class="flex items-center justify-center gap-2 rounded-lg h-12 px-8 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 hover:border-primary transition-colors text-base font-bold">
+                        <span class="material-symbols-outlined">school</span>
+                        Learn Pipeline
+                    </a>
+                </div>
+            </div>
+
+            <!-- Feature Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mt-8">
+                <div class="flex flex-col gap-4 p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="size-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-3xl">segment</span>
+                    </div>
+                    <h3 class="text-xl font-bold">ECS Stemming</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">
+                        Sastrawi library implements Enhanced Confix Stripping for accurate Indonesian morphological analysis.
+                    </p>
+                </div>
+
+                <div class="flex flex-col gap-4 p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="size-12 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-600 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-3xl">grid_on</span>
+                    </div>
+                    <h3 class="text-xl font-bold">TF-IDF Weighting</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">
+                        Term Frequency × Inverse Document Frequency for semantic importance ranking.
+                    </p>
+                </div>
+
+                <div class="flex flex-col gap-4 p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="size-12 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-3xl">hub</span>
+                    </div>
+                    <h3 class="text-xl font-bold">Cosine Similarity</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">
+                        Vector space model using angular distance to measure document relevance.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Technologies Section -->
+            <div class="w-full mt-12 p-8 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl border border-blue-100 dark:border-blue-900/50">
+                <h3 class="text-2xl font-bold mb-6 text-center">Key Technologies</h3>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div class="text-center">
+                        <div class="font-mono text-sm font-bold text-primary">Case Folding</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-mono text-sm font-bold text-primary">Tokenization</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-mono text-sm font-bold text-primary">Stopword Removal</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-mono text-sm font-bold text-primary">ECS Stemming</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-mono text-sm font-bold text-primary">VSM Ranking</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-200 dark:border-gray-800 py-8 px-6 mt-16">
+        <div class="max-w-[1200px] mx-auto text-center text-sm text-gray-600 dark:text-gray-400">
+            <p>Indonesian Document Retrieval System • Educational Demo • Data Mining Project</p>
+        </div>
+    </footer>
+</body>
+</html>

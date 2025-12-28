@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Sistem IR - Document Retrieval Dashboard</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Material Icons -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Tailwind Config -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1152d4",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1a2230",
+                        "border-light": "#cfd7e7",
+                        "border-dark": "#2a3447",
+                        "text-main-light": "#0d121b",
+                        "text-main-dark": "#ffffff",
+                        "text-sec-light": "#4c669a",
+                        "text-sec-dark": "#94a3b8",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "sans": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .icon-filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark transition-colors duration-200">
+    <div class="relative flex h-screen w-full overflow-hidden">
+        <!-- Sidebar -->
+        <aside
+            class="flex w-72 flex-col justify-between border-r border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark transition-colors duration-200">
+            <div class="flex flex-col h-full">
+                <!-- Sidebar Header -->
+                <div class="p-6 pb-2">
+                    <div class="flex items-center gap-3 mb-8">
+                        <div
+                            class="flex items-center justify-center rounded-lg size-10 bg-gradient-to-br from-primary to-blue-600 text-white shadow-lg shadow-primary/20">
+                            <span class="material-symbols-outlined">library_books</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <h1 class="text-text-main-light dark:text-text-main-dark text-base font-bold leading-none">
+                                Sistem IR</h1>
+                            <p class="text-text-sec-light dark:text-text-sec-dark text-xs font-normal mt-1">Information
+                                Retrieval</p>
+                        </div>
+                    </div>
+                    <!-- Navigation -->
+                    <nav class="flex flex-col gap-2">
+                        <!-- Dashboard (Active) -->
+                        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary text-white shadow-md shadow-primary/20 group transition-all"
+                            href="#">
+                            <span class="material-symbols-outlined icon-filled">dashboard</span>
+                            <span class="text-sm font-medium leading-normal">Dashboard</span>
+                        </a>
+                        <!-- Preprocessing -->
+                        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-sec-light dark:text-text-sec-dark hover:bg-background-light dark:hover:bg-background-dark hover:text-primary dark:hover:text-white transition-all"
+                            href="#">
+                            <span class="material-symbols-outlined">segment</span>
+                            <span class="text-sm font-medium leading-normal">Langkah Preprocessing</span>
+                        </a>
+                        <!-- TF-IDF -->
+                        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-sec-light dark:text-text-sec-dark hover:bg-background-light dark:hover:bg-background-dark hover:text-primary dark:hover:text-white transition-all"
+                            href="#">
+                            <span class="material-symbols-outlined">grid_on</span>
+                            <span class="text-sm font-medium leading-normal">Matriks TF-IDF</span>
+                        </a>
+                        <!-- Similarity -->
+                        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-sec-light dark:text-text-sec-dark hover:bg-background-light dark:hover:bg-background-dark hover:text-primary dark:hover:text-white transition-all"
+                            href="#">
+                            <span class="material-symbols-outlined">hub</span>
+                            <span class="text-sm font-medium leading-normal">Hasil Similaritas</span>
+                        </a>
+                    </nav>
+                </div>
+                <!-- Sidebar Footer -->
+                <div class="p-4 mt-auto border-t border-border-light dark:border-border-dark">
+                    <div class="flex items-center gap-3 px-2 py-2">
+                        <div class="bg-center bg-no-repeat bg-cover rounded-full size-8 bg-slate-200"
+                            data-alt="User profile avatar placeholder"
+                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAac5M19_cvY76ASauecnz0UKL60dT2r_3mznDwn-M0akbqZ_5Hw-alS7U1wJ03UoeLqPmcBexWBg2U9hkSoRaQsRQWA7NE_VvuF9Gjmq81f28uExGm6R7qRPF5EmQbGNjMhODP0_vBJHEgtCoZKZxhEwVkzAG8BnQE96ozXn7CSamo3P9lIJTnrcheHIsPEELMwPIZr6mxdWTr4tnrbHFOBBxpFIKyYSut_Mdx-XQf0XTfnlthJM3VHnlWonZUMiun5TNQ9762pw");'>
+                        </div>
+                        <div class="flex flex-col">
+                            <p class="text-text-main-light dark:text-text-main-dark text-sm font-medium">Mahasiswa</p>
+                            <p class="text-text-sec-light dark:text-text-sec-dark text-xs">Admin Akses</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col h-full overflow-y-auto bg-background-light dark:bg-background-dark">
+            <div class="layout-container flex flex-col w-full max-w-[1200px] mx-auto p-6 md:p-8 lg:p-10 gap-8">
+                <!-- Page Heading -->
+                <div class="flex flex-wrap justify-between items-end gap-4">
+                    <div class="flex flex-col gap-2">
+                        <h2
+                            class="text-text-main-light dark:text-text-main-dark text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
+                            Sistem Temu Kembali Informasi</h2>
+                        <p class="text-text-sec-light dark:text-text-sec-dark text-base font-normal">Dasbor pengelolaan
+                            korpus dan pengujian kueri pencarian dokumen Bahasa Indonesia.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="flex h-2 w-2 rounded-full bg-green-500"></span>
+                        <span class="text-sm font-medium text-text-sec-light dark:text-text-sec-dark">Server
+                            Online</span>
+                    </div>
+                </div>
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div
+                        class="flex flex-col gap-2 rounded-xl p-6 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-primary">
+                                <span class="material-symbols-outlined">library_books</span>
+                            </div>
+                            <p class="text-text-sec-light dark:text-text-sec-dark text-sm font-medium">Dokumen Terindeks
+                            </p>
+                        </div>
+                        <p class="text-text-main-light dark:text-text-main-dark tracking-tight text-3xl font-bold mt-2">
+                            12</p>
+                        <p class="text-xs text-text-sec-light dark:text-text-sec-dark">+2 ditambahkan hari ini</p>
+                    </div>
+                    <div
+                        class="flex flex-col gap-2 rounded-xl p-6 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="p-2 rounded-lg bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
+                                <span class="material-symbols-outlined">data_object</span>
+                            </div>
+                            <p class="text-text-sec-light dark:text-text-sec-dark text-sm font-medium">Total Token</p>
+                        </div>
+                        <p class="text-text-main-light dark:text-text-main-dark tracking-tight text-3xl font-bold mt-2">
+                            45,230</p>
+                        <p class="text-xs text-text-sec-light dark:text-text-sec-dark">Termasuk stopwords</p>
+                    </div>
+                    <div
+                        class="flex flex-col gap-2 rounded-xl p-6 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="p-2 rounded-lg bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400">
+                                <span class="material-symbols-outlined">verified</span>
+                            </div>
+                            <p class="text-text-sec-light dark:text-text-sec-dark text-sm font-medium">Status
+                                Preprocessing</p>
+                        </div>
+                        <p class="text-text-main-light dark:text-text-main-dark tracking-tight text-3xl font-bold mt-2">
+                            Siap</p>
+                        <p class="text-xs text-text-sec-light dark:text-text-sec-dark">Model TF-IDF mutakhir</p>
+                    </div>
+                </div>
+                <!-- Main Content Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Left Column: Search & Results Preview (Takes 2/3 width) -->
+                    <div class="lg:col-span-2 flex flex-col gap-8">
+                        <!-- Search Section -->
+                        <div class="flex flex-col gap-4">
+                            <div class="flex items-center justify-between">
+                                <h3
+                                    class="text-text-main-light dark:text-text-main-dark text-xl font-bold leading-tight">
+                                    1. Pencarian (Query)</h3>
+                                <button class="text-primary text-sm font-medium hover:underline">Reset</button>
+                            </div>
+                            <div
+                                class="rounded-xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-6 shadow-sm">
+                                <label
+                                    class="block text-sm font-medium text-text-main-light dark:text-text-main-dark mb-2">Masukkan
+                                    kueri dalam Bahasa Indonesia</label>
+                                <div class="relative flex items-center">
+                                    <span
+                                        class="absolute left-4 text-text-sec-light dark:text-text-sec-dark material-symbols-outlined">search</span>
+                                    <input
+                                        class="w-full h-12 pl-12 pr-4 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark text-text-main-light dark:text-text-main-dark focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-text-sec-light/50 dark:placeholder:text-text-sec-dark/50"
+                                        placeholder="Contoh: Dampak perubahan iklim di Jakarta..." type="text" />
+                                    <button
+                                        class="absolute right-2 h-8 px-4 bg-primary hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors">
+                                        Cari
+                                    </button>
+                                </div>
+                                <div class="mt-4 flex gap-2 overflow-x-auto pb-2">
+                                    <span
+                                        class="text-xs font-medium text-text-sec-light dark:text-text-sec-dark whitespace-nowrap pt-1">Saran:</span>
+                                    <button
+                                        class="px-3 py-1 rounded-full bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark text-xs text-text-sec-light dark:text-text-sec-dark hover:border-primary hover:text-primary transition-colors whitespace-nowrap">Ekonomi
+                                        digital</button>
+                                    <button
+                                        class="px-3 py-1 rounded-full bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark text-xs text-text-sec-light dark:text-text-sec-dark hover:border-primary hover:text-primary transition-colors whitespace-nowrap">Hukum
+                                        pidana</button>
+                                    <button
+                                        class="px-3 py-1 rounded-full bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark text-xs text-text-sec-light dark:text-text-sec-dark hover:border-primary hover:text-primary transition-colors whitespace-nowrap">Teknologi
+                                        pendidikan</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Document List Section -->
+                        <div class="flex flex-col gap-4">
+                            <h3 class="text-text-main-light dark:text-text-main-dark text-xl font-bold leading-tight">2.
+                                Dokumen Tersimpan</h3>
+                            <div
+                                class="rounded-xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark overflow-hidden shadow-sm">
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left text-sm">
+                                        <thead
+                                            class="bg-background-light dark:bg-surface-dark border-b border-border-light dark:border-border-dark">
+                                            <tr>
+                                                <th
+                                                    class="px-6 py-4 font-semibold text-text-main-light dark:text-text-main-dark">
+                                                    Nama File</th>
+                                                <th
+                                                    class="px-6 py-4 font-semibold text-text-main-light dark:text-text-main-dark">
+                                                    Ukuran</th>
+                                                <th
+                                                    class="px-6 py-4 font-semibold text-text-main-light dark:text-text-main-dark">
+                                                    Status</th>
+                                                <th
+                                                    class="px-6 py-4 font-semibold text-text-main-light dark:text-text-main-dark text-right">
+                                                    Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-border-light dark:divide-border-dark">
+                                            <!-- Row 1 -->
+                                            <tr
+                                                class="hover:bg-background-light dark:hover:bg-background-dark/50 transition-colors">
+                                                <td class="px-6 py-4">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="text-red-500 material-symbols-outlined">
+                                                            picture_as_pdf</div>
+                                                        <span
+                                                            class="font-medium text-text-main-light dark:text-text-main-dark">uu_ite_2008.pdf</span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 text-text-sec-light dark:text-text-sec-dark">2.4 MB
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                                        Terindeks
+                                                    </span>
+                                                </td>
+                                                <td class="px-6 py-4 text-right">
+                                                    <button
+                                                        class="text-text-sec-light dark:text-text-sec-dark hover:text-red-600 transition-colors">
+                                                        <span class="material-symbols-outlined text-lg">delete</span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <!-- Row 2 -->
+                                            <tr
+                                                class="hover:bg-background-light dark:hover:bg-background-dark/50 transition-colors">
+                                                <td class="px-6 py-4">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="text-blue-500 material-symbols-outlined">description
+                                                        </div>
+                                                        <span
+                                                            class="font-medium text-text-main-light dark:text-text-main-dark">artikel_kesehatan.txt</span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 text-text-sec-light dark:text-text-sec-dark">45 KB
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                                        Terindeks
+                                                    </span>
+                                                </td>
+                                                <td class="px-6 py-4 text-right">
+                                                    <button
+                                                        class="text-text-sec-light dark:text-text-sec-dark hover:text-red-600 transition-colors">
+                                                        <span class="material-symbols-outlined text-lg">delete</span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <!-- Row 3 -->
+                                            <tr
+                                                class="hover:bg-background-light dark:hover:bg-background-dark/50 transition-colors">
+                                                <td class="px-6 py-4">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="text-red-500 material-symbols-outlined">
+                                                            picture_as_pdf</div>
+                                                        <span
+                                                            class="font-medium text-text-main-light dark:text-text-main-dark">laporan_tahunan.pdf</span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 text-text-sec-light dark:text-text-sec-dark">1.8 MB
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <span
+                                                        class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                                                        <span
+                                                            class="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></span>
+                                                        Memproses
+                                                    </span>
+                                                </td>
+                                                <td class="px-6 py-4 text-right">
+                                                    <button
+                                                        class="text-text-sec-light dark:text-text-sec-dark hover:text-red-600 transition-colors">
+                                                        <span class="material-symbols-outlined text-lg">delete</span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div
+                                    class="px-6 py-4 border-t border-border-light dark:border-border-dark bg-background-light/50 dark:bg-background-dark/50 flex justify-center">
+                                    <button
+                                        class="text-sm font-medium text-primary hover:text-blue-700 dark:hover:text-blue-400 transition-colors">Lihat
+                                        Semua Dokumen</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right Column: Upload Widget (Takes 1/3 width) -->
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-text-main-light dark:text-text-main-dark text-xl font-bold leading-tight">3.
+                            Ingesti Data</h3>
+                        <div
+                            class="flex flex-col h-fit rounded-xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-6 shadow-sm sticky top-6">
+                            <div
+                                class="flex flex-col items-center gap-4 text-center border-2 border-dashed border-border-light dark:border-border-dark rounded-lg p-8 bg-background-light/30 dark:bg-background-dark/30 hover:bg-background-light hover:border-primary/50 transition-all cursor-pointer group">
+                                <div
+                                    class="p-3 rounded-full bg-primary/10 text-primary group-hover:scale-110 transition-transform duration-300">
+                                    <span class="material-symbols-outlined text-3xl">cloud_upload</span>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <p class="text-text-main-light dark:text-text-main-dark text-base font-bold">Unggah
+                                        Korpus</p>
+                                    <p class="text-text-sec-light dark:text-text-sec-dark text-sm">Drag &amp; drop PDF
+                                        atau TXT</p>
+                                </div>
+                                <button
+                                    class="mt-2 px-4 py-2 bg-primary text-white text-sm font-bold rounded-lg shadow-sm hover:bg-blue-700 transition-colors">
+                                    Pilih File
+                                </button>
+                            </div>
+                            <div class="mt-6 flex flex-col gap-3">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wider text-text-sec-light dark:text-text-sec-dark">
+                                    Panduan Unggah</p>
+                                <div class="flex gap-3 items-start">
+                                    <span
+                                        class="material-symbols-outlined text-primary text-lg mt-0.5">check_circle</span>
+                                    <p class="text-sm text-text-sec-light dark:text-text-sec-dark">Gunakan format .txt
+                                        untuk hasil preprocessing terbaik.</p>
+                                </div>
+                                <div class="flex gap-3 items-start">
+                                    <span
+                                        class="material-symbols-outlined text-primary text-lg mt-0.5">check_circle</span>
+                                    <p class="text-sm text-text-sec-light dark:text-text-sec-dark">Maksimal ukuran file
+                                        10MB per dokumen.</p>
+                                </div>
+                                <div class="flex gap-3 items-start">
+                                    <span
+                                        class="material-symbols-outlined text-primary text-lg mt-0.5">check_circle</span>
+                                    <p class="text-sm text-text-sec-light dark:text-text-sec-dark">Dokumen harus dalam
+                                        Bahasa Indonesia.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

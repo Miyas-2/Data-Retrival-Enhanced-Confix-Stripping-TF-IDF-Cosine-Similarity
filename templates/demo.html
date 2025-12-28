@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Demo - Indonesian Document Retrieval</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols_Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "primary": "#1152d4", "background-light": "#f6f6f8", "background-dark": "#101622" },
+                    fontFamily: { "display": ["Inter", "sans-serif"] },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-900 dark:text-white">
+    <!-- Top Navigation -->
+    <header class="sticky top-0 z-50 bg-white/90 dark:bg-[#1a202c]/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-6 py-3">
+        <div class="max-w-[1400px] mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="size-8 text-primary">
+                    <span class="material-symbols-outlined text-3xl">manage_search</span>
+                </div>
+                <h2 class="text-lg font-bold">IndoRetrieve Demo</h2>
+            </div>
+            <div class="flex items-center gap-6">
+                <a class="text-sm font-medium hover:text-primary transition-colors" href="/">Home</a>
+                <a class="text-sm font-bold text-primary" href="/dashboard">Demo</a>
+                <a class="text-sm font-medium hover:text-primary transition-colors" href="/preprocessing">Pipeline</a>
+                <a class="text-sm font-medium hover:text-primary transition-colors" href="/tfidf">TF-IDF</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Stats Row -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-primary">
+                        <span class="material-symbols-outlined">library_books</span>
+                    </div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Documents</p>
+                </div>
+                <p class="text-3xl font-bold" id="stat-docs">{{ stats.num_docs }}</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="p-2 rounded-lg bg-purple-50 dark:bg-purple-900/30 text-purple-600">
+                        <span class="material-symbols-outlined">data_object</span>
+                    </div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Vocabulary</p>
+                </div>
+                <p class="text-3xl font-bold" id="stat-vocab">{{ stats.vocab_size }}</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="p-2 rounded-lg bg-green-50 dark:bg-green-900/30 text-green-600">
+                        <span class="material-symbols-outlined">token</span>
+                    </div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Tokens</p>
+                </div>
+                <p class="text-3xl font-bold" id="stat-tokens">{{ stats.total_tokens }}</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="p-2 rounded-lg bg-orange-50 dark:bg-orange-900/30 text-orange-600">
+                        <span class="material-symbols-outlined">verified</span>
+                    </div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Status</p>
+                </div>
+                <p class="text-xl font-bold {% if stats.processed %}text-green-600{% else %}text-orange-600{% endif %}" id="stat-status">
+                    {% if stats.processed %}Ready{% else %}Pending{% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left: Search & Results -->
+            <div class="lg:col-span-2 flex flex-col gap-6">
+                <!-- Search Section -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">search</span>
+                        Document Search
+                    </h3>
+                    <div class="flex gap-3">
+                        <input type="text" id="query-input" placeholder="Enter Indonesian query (e.g., sejarah kemerdekaan indonesia)" 
+                               class="flex-1 px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-primary focus:border-primary">
+                        <button id="search-btn" onclick="performSearch()" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors font-bold flex items-center gap-2">
+                            <span class="material-symbols-outlined">search</span>
+                            Search
+                        </button>
+                    </div>
+                    <div id="search-status" class="mt-3 text-sm text-gray-600 dark:text-gray-400"></div>
+                </div>
+
+                <!-- Results Section -->
+                <div id="results-container" class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm hidden">
+                    <h3 class="text-xl font-bold mb-4">Search Results</h3>
+                    <div id="results-list" class="flex flex-col gap-4"></div>
+                </div>
+
+                <!-- Query Processing Steps (expandable) -->
+                <div id="query-steps-container" class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm hidden">
+                    <details class="group">
+                        <summary class="cursor-pointer text-lg font-bold flex items-center gap-2 list-none">
+                            <span class="material-symbols-outlined text-primary">list</span>
+                            Query Preprocessing Steps
+                            <span class="material-symbols-outlined ml-auto group-open:rotate-180 transition-transform">expand_more</span>
+                        </summary>
+                        <div id="query-steps" class="mt-4 flex flex-col gap-3"></div>
+                    </details>
+                </div>
+            </div>
+
+            <!-- Right: Document Management -->
+            <div class="flex flex-col gap-6">
+                <!-- Upload Section -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">upload_file</span>
+                        Upload Documents
+                    </h3>
+                    <input type="file" id="file-input" accept=".txt,.pdf,.docx" class="hidden" onchange="uploadFile()">
+                    <button onclick="document.getElementById('file-input').click()" 
+                            class="w-full px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary transition-colors flex items-center justify-center gap-2 text-gray-600 dark:text-gray-400 hover:text-primary">
+                        <span class="material-symbols-outlined">add</span>
+                        Choose File (.txt, .pdf, .docx)
+                    </button>
+                    <div class="mt-4">
+                        <button onclick="loadDataset()" class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium">
+                            Load from Dataset Folder
+                        </button>
+                    </div>
+                    <div class="mt-4">
+                        <button onclick="processCorpus()" id="process-btn" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-bold flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined">play_arrow</span>
+                            Process Corpus
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Document List -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">folder</span>
+                        Documents (<span id="doc-count">{{ stats.num_docs }}</span>)
+                    </h3>
+                    <div id="doc-list" class="flex flex-col gap-2 max-h-96 overflow-y-auto">
+                        {% for doc in documents %}
+                        <div class="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-sm text-gray-400">description</span>
+                                <span class="text-sm font-medium truncate">{{ doc.filename }}</span>
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-sm text-gray-500">No documents yet. Upload or load from dataset.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert(`File uploaded: ${data.filename}`);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Upload failed: ' + error);
+            }
+        }
+
+        async function loadDataset() {
+            try {
+                const response = await fetch('/api/load_dataset', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({path: 'dataset'})
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert(`Loaded ${data.num_docs} documents from dataset`);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Load failed: ' + error);
+            }
+        }
+
+        async function processCorpus() {
+            const btn = document.getElementById('process-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Processing...';
+
+            try {
+                const response = await fetch('/api/process', {method: 'POST'});
+                const data = await response.json();
+                if (data.success) {
+                    alert(`Corpus processed! Vocabulary: ${data.stats.vocab_size}, Tokens: ${data.stats.total_tokens}`);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Processing failed: ' + error);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Process Corpus';
+            }
+        }
+
+        async function performSearch() {
+            const query = document.getElementById('query-input').value.trim();
+            if (!query) {
+                alert('Please enter a query');
+                return;
+            }
+
+            document.getElementById('search-status').textContent = 'Searching...';
+            
+            try {
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({query})
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResults(data);
+                    displayQuerySteps(data.query_steps);
+                } else {
+                    alert('Error: ' + data.error);
+                    document.getElementById('search-status').textContent = '';
+                }
+            } catch (error) {
+                alert('Search failed: ' + error);
+                document.getElementById('search-status').textContent = '';
+            }
+        }
+
+        function displayResults(data) {
+            const container = document.getElementById('results-container');
+            const list = document.getElementById('results-list');
+            
+            list.innerHTML = data.results.slice(0, 10).map((result, index) => `
+                <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <span class="text-2xl font-black text-gray-300">${String(index + 1).padStart(2, '0')}</span>
+                        <div>
+                            <div class="font-bold text-primary">${result.filename}</div>
+                            <div class="text-xs text-gray-500">Similarity Score</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-black">${result.similarity.toFixed(4)}</div>
+                        <div class="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mt-1">
+                            <div class="h-full bg-primary" style="width: ${result.similarity * 100}%"></div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.classList.remove('hidden');
+            document.getElementById('search-status').textContent = `Found ${data.num_results} results`;
+        }
+
+        function displayQuerySteps(steps) {
+            const container = document.getElementById('query-steps-container');
+            const stepsDiv = document.getElementById('query-steps');
+            
+            stepsDiv.innerHTML = `
+                <div class="p-3 bg-red-50 dark:bg-red-900/10 rounded-lg border border-red-100 dark:border-red-900/30">
+                    <span class="text-xs font-bold text-red-600 uppercase">Original</span>
+                    <p class="font-mono text-sm mt-1">${steps.original}</p>
+                </div>
+                <div class="p-3 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                    <span class="text-xs font-bold text-blue-600 uppercase">Case Folding</span>
+                    <p class="font-mono text-sm mt-1">${steps.case_folding}</p>
+                </div>
+                <div class="p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg border border-purple-100 dark:border-purple-900/30">
+                    <span class="text-xs font-bold text-purple-600 uppercase">After Stopword Removal</span>
+                    <p class="font-mono text-sm mt-1">${steps.stopword_removed}</p>
+                </div>
+                <div class="p-3 bg-green-50 dark:bg-green-900/10 rounded-lg border border-green-100 dark:border-green-900/30">
+                    <span class="text-xs font-bold text-green-600 uppercase">Stemmed (ECS)</span>
+                    <p class="font-mono text-sm mt-1">${steps.stemmed}</p>
+                </div>
+                <div class="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <span class="text-xs font-bold uppercase">Tokens</span>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        ${steps.tokens.map(t => `<span class="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-xs font-mono">${t}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+            
+            container.classList.remove('hidden');
+        }
+
+        // Allow Enter key to search
+        document.getElementById('query-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+    </script>
+</body>
+</html>

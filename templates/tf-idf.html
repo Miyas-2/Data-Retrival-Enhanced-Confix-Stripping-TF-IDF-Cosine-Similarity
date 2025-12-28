@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>TF-IDF Explanation - Indonesian Retrieval System</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1152d4",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace"],
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .math-font {
+            font-family: 'Times New Roman', Times, serif;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-[#0d121b] dark:text-white font-display overflow-x-hidden">
+    <!-- Top Navigation -->
+    <header class="sticky top-0 z-50 w-full bg-white dark:bg-[#1a2234] border-b border-[#e7ebf3] dark:border-[#2a3447]">
+        <div class="px-4 md:px-10 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-4 text-[#0d121b] dark:text-white">
+                <div class="size-6 text-primary">
+                    <span class="material-symbols-outlined text-2xl">manage_search</span>
+                </div>
+                <h2 class="text-lg font-bold leading-tight tracking-[-0.015em] hidden sm:block">Sistem Temu Kembali</h2>
+            </div>
+            <div class="flex items-center gap-4 sm:gap-8">
+                <div class="hidden md:flex items-center gap-6">
+                    <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Home</a>
+                    <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Demo</a>
+                    <a class="text-sm font-medium text-primary" href="#">Explanation</a>
+                    <a class="text-sm font-medium hover:text-primary transition-colors" href="#">About</a>
+                </div>
+                <button
+                    class="flex items-center justify-center rounded-lg h-9 px-4 bg-primary text-white text-sm font-bold hover:bg-blue-700 transition-colors">
+                    Login
+                </button>
+            </div>
+        </div>
+    </header>
+    <div class="flex flex-col min-h-screen">
+        <div class="layout-container flex grow flex-col items-center">
+            <!-- Page Heading & Context -->
+            <div class="w-full max-w-[1024px] px-4 sm:px-6 py-8">
+                <div class="flex flex-col md:flex-row justify-between gap-6 mb-8">
+                    <div class="flex flex-col gap-2">
+                        <div class="flex items-center gap-2 text-primary mb-1">
+                            <span class="material-symbols-outlined text-sm">school</span>
+                            <span class="text-xs font-bold uppercase tracking-wider">Educational Demo</span>
+                        </div>
+                        <h1 class="text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">TF-IDF Values
+                            Explanation</h1>
+                        <p class="text-[#4c669a] dark:text-[#94a3b8] text-base font-normal max-w-2xl mt-2">
+                            Understand the mathematics behind document ranking: from raw counts to weighted relevance
+                            scores for the query <span
+                                class="font-mono bg-blue-100 dark:bg-blue-900/30 text-primary px-1.5 py-0.5 rounded text-sm font-bold">"hutan
+                                hujan"</span>.
+                        </p>
+                    </div>
+                    <div class="flex items-start">
+                        <button
+                            class="flex items-center justify-center gap-2 rounded-lg h-10 px-4 bg-white dark:bg-[#1e293b] border border-[#cfd7e7] dark:border-[#334155] text-sm font-bold shadow-sm hover:bg-gray-50 dark:hover:bg-[#2a3649] transition-colors">
+                            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+                            <span>Back to Search</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Tabs Navigation -->
+                <div class="sticky top-[65px] z-40 bg-background-light dark:bg-background-dark pt-2 pb-4 mb-4">
+                    <div
+                        class="flex overflow-x-auto border-b border-[#cfd7e7] dark:border-[#334155] gap-8 no-scrollbar">
+                        <a class="flex flex-col items-center justify-center border-b-[3px] border-b-primary text-[#0d121b] dark:text-white pb-3 min-w-fit px-2 transition-all"
+                            href="#section-tf">
+                            <p class="text-sm font-bold tracking-[0.015em]">1. Term Frequency (TF)</p>
+                        </a>
+                        <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent hover:border-b-gray-300 dark:hover:border-b-gray-600 text-[#4c669a] dark:text-[#94a3b8] pb-3 min-w-fit px-2 transition-all"
+                            href="#section-idf">
+                            <p class="text-sm font-bold tracking-[0.015em]">2. Inverse Doc Frequency (IDF)</p>
+                        </a>
+                        <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent hover:border-b-gray-300 dark:hover:border-b-gray-600 text-[#4c669a] dark:text-[#94a3b8] pb-3 min-w-fit px-2 transition-all"
+                            href="#section-tfidf">
+                            <p class="text-sm font-bold tracking-[0.015em]">3. Final TF-IDF Scores</p>
+                        </a>
+                    </div>
+                </div>
+                <!-- Step 1: Term Frequency -->
+                <section class="mb-16 scroll-mt-32" id="section-tf">
+                    <div
+                        class="bg-white dark:bg-[#1e293b] rounded-xl shadow-sm border border-[#e7ebf3] dark:border-[#334155] overflow-hidden">
+                        <div class="p-6 md:p-8">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div
+                                    class="size-10 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-primary font-bold">
+                                    1</div>
+                                <h2 class="text-xl font-bold">Term Frequency (TF)</h2>
+                            </div>
+                            <div class="grid lg:grid-cols-3 gap-8">
+                                <div class="lg:col-span-1 space-y-6">
+                                    <p class="text-[#4c669a] dark:text-[#94a3b8] text-sm leading-relaxed">
+                                        TF measures how frequently a term occurs in a document. The simplest form is a
+                                        raw count of instances. In this example, we count occurrences of terms related
+                                        to "Hutan Hujan" (Rainforest).
+                                    </p>
+                                    <!-- Formula Card -->
+                                    <div
+                                        class="bg-[#f8f9fc] dark:bg-[#0f172a] border border-[#e7ebf3] dark:border-[#334155] rounded-lg p-5">
+                                        <h3
+                                            class="text-xs font-bold text-[#4c669a] dark:text-[#94a3b8] uppercase tracking-wider mb-3">
+                                            Formula</h3>
+                                        <div class="text-lg text-center py-2">
+                                            <span class="math-font">tf(t, d)</span> = <span class="font-mono">count(t,
+                                                d)</span>
+                                        </div>
+                                        <p class="text-xs text-center text-[#4c669a] dark:text-[#64748b] mt-2">
+                                            Where <span class="math-font">t</span> is the term and <span
+                                                class="math-font">d</span> is the document.
+                                        </p>
+                                    </div>
+                                    <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg flex gap-3 items-start">
+                                        <span class="material-symbols-outlined text-primary text-xl mt-0.5">info</span>
+                                        <p class="text-xs text-blue-800 dark:text-blue-200">
+                                            Note: More advanced systems may use logarithmic normalization like <span
+                                                class="font-mono text-[10px]">1 + log(count)</span> to dampen the effect
+                                            of high frequency terms.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="lg:col-span-2 overflow-x-auto">
+                                    <table
+                                        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                        <thead
+                                            class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-[#0f172a] dark:text-gray-400">
+                                            <tr>
+                                                <th class="px-6 py-4 rounded-tl-lg" scope="col">Term (Kata)</th>
+                                                <th class="px-6 py-4 font-mono text-center text-primary" scope="col">Doc
+                                                    1</th>
+                                                <th class="px-6 py-4 font-mono text-center text-primary" scope="col">Doc
+                                                    2</th>
+                                                <th class="px-6 py-4 font-mono text-center text-primary rounded-tr-lg"
+                                                    scope="col">Doc 3</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr
+                                                class="bg-white border-b dark:bg-[#1e293b] dark:border-[#334155] hover:bg-gray-50 dark:hover:bg-[#2a3649]">
+                                                <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                    scope="row">
+                                                    hutan
+                                                </th>
+                                                <td class="px-6 py-4 text-center font-mono">1</td>
+                                                <td
+                                                    class="px-6 py-4 text-center font-mono bg-blue-50 dark:bg-blue-900/20 font-bold text-primary">
+                                                    3</td>
+                                                <td class="px-6 py-4 text-center font-mono">0</td>
+                                            </tr>
+                                            <tr
+                                                class="bg-white border-b dark:bg-[#1e293b] dark:border-[#334155] hover:bg-gray-50 dark:hover:bg-[#2a3649]">
+                                                <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                    scope="row">
+                                                    hujan
+                                                </th>
+                                                <td class="px-6 py-4 text-center font-mono">1</td>
+                                                <td
+                                                    class="px-6 py-4 text-center font-mono bg-blue-50 dark:bg-blue-900/20 font-bold text-primary">
+                                                    2</td>
+                                                <td class="px-6 py-4 text-center font-mono">0</td>
+                                            </tr>
+                                            <tr
+                                                class="bg-white border-b dark:bg-[#1e293b] dark:border-[#334155] hover:bg-gray-50 dark:hover:bg-[#2a3649]">
+                                                <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                    scope="row">
+                                                    tropis
+                                                </th>
+                                                <td class="px-6 py-4 text-center font-mono">0</td>
+                                                <td
+                                                    class="px-6 py-4 text-center font-mono bg-blue-50 dark:bg-blue-900/20 font-bold text-primary">
+                                                    4</td>
+                                                <td class="px-6 py-4 text-center font-mono">1</td>
+                                            </tr>
+                                            <tr
+                                                class="bg-white dark:bg-[#1e293b] hover:bg-gray-50 dark:hover:bg-[#2a3649]">
+                                                <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                    scope="row">
+                                                    ekosistem
+                                                </th>
+                                                <td class="px-6 py-4 text-center font-mono">1</td>
+                                                <td class="px-6 py-4 text-center font-mono">1</td>
+                                                <td
+                                                    class="px-6 py-4 text-center font-mono bg-blue-50 dark:bg-blue-900/20 font-bold text-primary">
+                                                    2</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="mt-4 flex justify-end">
+                                        <p class="text-xs text-gray-400 italic">Total Documents (N) = 3</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- Step 2: IDF -->
+                <section class="mb-16 scroll-mt-32" id="section-idf">
+                    <div
+                        class="bg-white dark:bg-[#1e293b] rounded-xl shadow-sm border border-[#e7ebf3] dark:border-[#334155] overflow-hidden">
+                        <div class="p-6 md:p-8">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div
+                                    class="size-10 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-primary font-bold">
+                                    2</div>
+                                <h2 class="text-xl font-bold">Inverse Document Frequency (IDF)</h2>
+                            </div>
+                            <div class="grid lg:grid-cols-3 gap-8">
+                                <div class="lg:col-span-1 space-y-6">
+                                    <p class="text-[#4c669a] dark:text-[#94a3b8] text-sm leading-relaxed">
+                                        IDF diminishes the weight of terms that occur very frequently in the document
+                                        set and increases the weight of terms that occur rarely.
+                                    </p>
+                                    <!-- Formula Card -->
+                                    <div
+                                        class="bg-[#f8f9fc] dark:bg-[#0f172a] border border-[#e7ebf3] dark:border-[#334155] rounded-lg p-5">
+                                        <h3
+                                            class="text-xs font-bold text-[#4c669a] dark:text-[#94a3b8] uppercase tracking-wider mb-3">
+                                            Formula</h3>
+                                        <div class="text-lg text-center py-2 flex items-center justify-center gap-2">
+                                            <span class="math-font">idf(t)</span> = <span class="math-font">log</span>
+                                            <div
+                                                class="flex flex-col items-center justify-center leading-none text-base">
+                                                <span class="border-b border-gray-400 px-1 mb-0.5">N</span>
+                                                <span class="px-1">df(t)</span>
+                                            </div>
+                                        </div>
+                                        <p class="text-xs text-center text-[#4c669a] dark:text-[#64748b] mt-3">
+                                            <span class="math-font">N</span>: Total docs (3)<br />
+                                            <span class="math-font">df(t)</span>: Docs containing term t
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="lg:col-span-2 overflow-x-auto">
+                                    <table
+                                        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                        <thead
+                                            class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-[#0f172a] dark:text-gray-400">
+                                            <tr>
+                                                <th class="px-6 py-4 rounded-tl-lg" scope="col">Term (Kata)</th>
+                                                <th class="px-6 py-4 text-center" scope="col">Doc Frequency <span
+                                                        class="lowercase font-mono">(df)</span></th>
+                                                <th class="px-6 py-4 text-center" scope="col">Calculation</th>
+                                                <th class="px-6 py-4 text-right rounded-tr-lg text-primary font-bold"
+                                                    scope="col">IDF Score</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="bg-white border-b dark:bg-[#1e293b] dark:border-[#334155]">
+                                                <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                    scope="row">
+                                                    hutan
+                                                </th>
+                                                <td class="px-6 py-4 text-center font-mono">2</td>
+                                                <td class="px-6 py-4 text-center font-mono text-xs text-gray-400">
+                                                    log(3/2)</td>
+                                                <td
+                                                    class="px-6 py-4 text-right font-mono font-bold text-gray-800 dark:text-gray-200">
+                                                    0.176</td>
+                                            </tr>
+                                            <tr class="bg-white border-b dark:bg-[#1e293b] dark:border-[#334155]">
+                                                <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                    scope="row">
+                                                    hujan
+                                                </th>
+                                                <td class="px-6 py-4 text-center font-mono">2</td>
+                                                <td class="px-6 py-4 text-center font-mono text-xs text-gray-400">
+                                                    log(3/2)</td>
+                                                <td
+                                                    class="px-6 py-4 text-right font-mono font-bold text-gray-800 dark:text-gray-200">
+                                                    0.176</td>
+                                            </tr>
+                                            <tr class="bg-white border-b dark:bg-[#1e293b] dark:border-[#334155]">
+                                                <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                    scope="row">
+                                                    tropis
+                                                </th>
+                                                <td class="px-6 py-4 text-center font-mono">2</td>
+                                                <td class="px-6 py-4 text-center font-mono text-xs text-gray-400">
+                                                    log(3/2)</td>
+                                                <td
+                                                    class="px-6 py-4 text-right font-mono font-bold text-gray-800 dark:text-gray-200">
+                                                    0.176</td>
+                                            </tr>
+                                            <tr class="bg-blue-50/50 dark:bg-blue-900/10">
+                                                <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                    scope="row">
+                                                    orangutan <span
+                                                        class="bg-blue-100 text-primary text-[10px] px-1.5 py-0.5 rounded ml-2 uppercase">Rare</span>
+                                                </th>
+                                                <td class="px-6 py-4 text-center font-mono">1</td>
+                                                <td class="px-6 py-4 text-center font-mono text-xs text-gray-400">
+                                                    log(3/1)</td>
+                                                <td class="px-6 py-4 text-right font-mono font-black text-primary">0.477
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="mt-4">
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 text-center">Notice how
+                                            "orangutan", appearing in only 1 document, gets a higher score.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- Step 3: TF-IDF -->
+                <section class="mb-12 scroll-mt-32" id="section-tfidf">
+                    <div
+                        class="bg-white dark:bg-[#1e293b] rounded-xl shadow-sm border border-[#e7ebf3] dark:border-[#334155] overflow-hidden">
+                        <div class="p-6 md:p-8">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div
+                                    class="size-10 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-primary font-bold">
+                                    3</div>
+                                <h2 class="text-xl font-bold">Final TF-IDF Scores</h2>
+                            </div>
+                            <div class="grid lg:grid-cols-3 gap-8">
+                                <div class="lg:col-span-1 space-y-6">
+                                    <p class="text-[#4c669a] dark:text-[#94a3b8] text-sm leading-relaxed">
+                                        We multiply the TF scores by the IDF scores. High scores indicate that a word is
+                                        both frequent in that specific document and relevant (not generic) across the
+                                        corpus.
+                                    </p>
+                                    <!-- Formula Card -->
+                                    <div
+                                        class="bg-[#f8f9fc] dark:bg-[#0f172a] border border-[#e7ebf3] dark:border-[#334155] rounded-lg p-5">
+                                        <h3
+                                            class="text-xs font-bold text-[#4c669a] dark:text-[#94a3b8] uppercase tracking-wider mb-3">
+                                            Formula</h3>
+                                        <div class="text-lg text-center py-2">
+                                            <span class="math-font font-bold text-primary">tfidf</span> = <span
+                                                class="math-font">tf</span> × <span class="math-font">idf</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col gap-2">
+                                        <h4 class="text-xs font-bold text-gray-500 uppercase">Relevance Key</h4>
+                                        <div class="flex items-center gap-2 text-xs">
+                                            <div class="w-4 h-4 rounded bg-white border border-gray-200"></div>
+                                            <span>Low</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-xs">
+                                            <div class="w-4 h-4 rounded bg-blue-100"></div> <span>Medium</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-xs">
+                                            <div class="w-4 h-4 rounded bg-primary"></div> <span>High</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="lg:col-span-2 overflow-x-auto">
+                                    <table
+                                        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                        <thead
+                                            class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-[#0f172a] dark:text-gray-400">
+                                            <tr>
+                                                <th class="px-6 py-4 rounded-tl-lg" scope="col">Term</th>
+                                                <th class="px-6 py-4 text-center" scope="col">Doc 1</th>
+                                                <th class="px-6 py-4 text-center" scope="col">Doc 2</th>
+                                                <th class="px-6 py-4 text-center rounded-tr-lg" scope="col">Doc 3</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                                            <tr class="bg-white dark:bg-[#1e293b]">
+                                                <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                    scope="row">
+                                                    hutan
+                                                </th>
+                                                <td class="px-6 py-4 text-center font-mono">
+                                                    <div
+                                                        class="py-1 px-2 rounded bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 inline-block w-full">
+                                                        0.176</div>
+                                                </td>
+                                                <td class="px-6 py-4 text-center font-mono">
+                                                    <!-- High score -->
+                                                    <div
+                                                        class="py-1 px-2 rounded bg-primary text-white font-bold inline-block w-full shadow-sm">
+                                                        0.528</div>
+                                                </td>
+                                                <td class="px-6 py-4 text-center font-mono text-gray-300">0.000</td>
+                                            </tr>
+                                            <tr class="bg-white dark:bg-[#1e293b]">
+                                                <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                    scope="row">
+                                                    hujan
+                                                </th>
+                                                <td class="px-6 py-4 text-center font-mono">
+                                                    <div
+                                                        class="py-1 px-2 rounded bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 inline-block w-full">
+                                                        0.176</div>
+                                                </td>
+                                                <td class="px-6 py-4 text-center font-mono">
+                                                    <div
+                                                        class="py-1 px-2 rounded bg-blue-200 dark:bg-blue-800 text-blue-900 dark:text-blue-100 font-bold inline-block w-full">
+                                                        0.352</div>
+                                                </td>
+                                                <td class="px-6 py-4 text-center font-mono text-gray-300">0.000</td>
+                                            </tr>
+                                            <tr class="bg-white dark:bg-[#1e293b]">
+                                                <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                    scope="row">
+                                                    tropis
+                                                </th>
+                                                <td class="px-6 py-4 text-center font-mono text-gray-300">0.000</td>
+                                                <td class="px-6 py-4 text-center font-mono">
+                                                    <!-- Very High Score -->
+                                                    <div
+                                                        class="py-1 px-2 rounded bg-primary text-white font-bold inline-block w-full shadow-md border border-blue-600">
+                                                        0.704</div>
+                                                </td>
+                                                <td class="px-6 py-4 text-center font-mono">
+                                                    <div
+                                                        class="py-1 px-2 rounded bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 inline-block w-full">
+                                                        0.176</div>
+                                                </td>
+                                            </tr>
+                                            <tr class="bg-white dark:bg-[#1e293b]">
+                                                <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                                    scope="row">
+                                                    orangutan
+                                                </th>
+                                                <td class="px-6 py-4 text-center font-mono text-gray-300">0.000</td>
+                                                <td class="px-6 py-4 text-center font-mono text-gray-300">0.000</td>
+                                                <td class="px-6 py-4 text-center font-mono">
+                                                    <div
+                                                        class="py-1 px-2 rounded bg-blue-200 dark:bg-blue-800 text-blue-900 dark:text-blue-100 font-bold inline-block w-full">
+                                                        0.477</div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Conclusion Footer inside card -->
+                        <div class="bg-gray-50 dark:bg-[#0f172a] p-6 border-t border-[#e7ebf3] dark:border-[#334155]">
+                            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-green-600">check_circle</span>
+                                    <p class="text-sm font-medium">Conclusion: <span class="font-bold">Document 2</span>
+                                        is the most relevant for "Hutan Hujan Tropis".</p>
+                                </div>
+                                <button
+                                    class="cursor-pointer bg-primary text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow hover:bg-blue-700 transition-colors flex items-center gap-2">
+                                    <span>View Search Results</span>
+                                    <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <!-- Footer -->
+        <footer class="bg-white dark:bg-[#1a2234] border-t border-[#e7ebf3] dark:border-[#2a3447] py-8 mt-auto">
+            <div
+                class="max-w-[1024px] mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-[#4c669a] dark:text-[#94a3b8] text-sm">
+                <p>© 2023 Retrieval System Demo. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a class="hover:text-primary" href="#">Documentation</a>
+                    <a class="hover:text-primary" href="#">Privacy Policy</a>
+                    <a class="hover:text-primary" href="#">Contact</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+
+</html>
